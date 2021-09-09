@@ -7,20 +7,43 @@ import { getAllPosts } from '../lib/api'
 import Head from 'next/head'
 import { CMS_NAME } from '../lib/constants'
 import Post from '../types/post'
+import { useState, useEffect } from 'react'
 
 type Props = {
   allPosts: Post[]
 }
 
+type Customer = {
+  firstName: string
+  lastName: string
+  address: Record<string, string>
+}
+
 const Index = ({ allPosts }: Props) => {
   const heroPost = allPosts[0]
   const morePosts = allPosts.slice(1)
+  const [customers, setCustomers] = useState<Customer[]>([])
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      const customerData = await fetch('/api/getCustomers');
+      const customerJson = await customerData.json();
+      setCustomers(customerJson);
+    }
+    fetchCustomers()
+  }, [])
+
   return (
     <>
       <Layout>
         <Head>
           <title>Next.js Blog Example with {CMS_NAME}</title>
         </Head>
+        <Container>
+        </Container>
+          <ul>
+            {customers.map(customer => (<li>{customer.firstName}</li>))}
+          </ul>
         <Container>
           <Intro />
           {heroPost && (
